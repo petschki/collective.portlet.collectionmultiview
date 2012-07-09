@@ -16,26 +16,7 @@ from plone.app.vocabularies.catalog import SearchableTextSourceBinder
 from collective.portlet.collectionmultiview.widget import RendererSelectWidget
 
 
-class ICollectionMultiView(IPortletDataProvider):
-
-    header = schema.TextLine(
-        title=_(u"Portlet header"),
-        description=_(u"Title of the rendered portlet"),
-        required=True)
-
-    target_collection = schema.Choice(
-        title=_(u"Target collection"),
-        description=_(u"Find the collection which provides the items to list"),
-        required=True,
-        source=SearchableTextSourceBinder(
-            {'portal_type': 'Topic'},
-            default_query='path:'))
-
-    limit = schema.Int(
-        title=_(u"Limit"),
-        description=_(u"Specify the maximum number of items to show in the "
-                      u"portlet. Leave this blank to show all items."),
-        required=False)
+class ICollectionMultiView(collection.ICollectionPortlet):
 
     renderer = schema.Choice(title=_(u'Renderer'),
                          description=_(u"The name of the Renderer for this portlet."),
@@ -108,7 +89,7 @@ def get_custom_widgets(request, renderer=u'default'):
         renderer = request.get('form.renderer')
     adapter = getAdapter(None, ICollectionMultiViewRenderer, renderer)
     return getattr(adapter, 'custom_widgets', {})
-        
+
 class AddForm(base.AddForm):
 
     @property
@@ -123,7 +104,7 @@ class AddForm(base.AddForm):
         return fields
 
     label = _(u'Add CollectionMultiView portlet')
-    description = _(u"This portlet display a listing of items from a" + 
+    description = _(u"This portlet display a listing of items from a" +
                         " Collection, using custom views")
 
     def create(self, data):
@@ -132,7 +113,7 @@ class AddForm(base.AddForm):
 
 
 class ExtendedDataAdapter(object):
-    """ 
+    """
         hack to lie to form.applyChanges that this object have
         all attributes
     """
